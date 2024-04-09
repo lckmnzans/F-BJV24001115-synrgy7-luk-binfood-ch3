@@ -22,6 +22,9 @@ public class Order implements OrderModel {
 
     @Override
     public void clearOrders() {
-        Arrays.fill(orderedMenu, 0);
+        for (int i = 0; i < 8; i++) {
+            orderedMenu[0][i] = 0;
+            orderedMenu[1][i] = 0;
+        }
     }
 }

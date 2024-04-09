@@ -6,17 +6,10 @@ import java.util.Scanner;
 import static org.example.Const.*;
 
 public class ConsoleOrderView implements OrderView {
-    private Scanner inputMenu;
+    private final Scanner inputMenu;
     public ConsoleOrderView() {
         this.inputMenu = new Scanner(System.in);
-        init();
-    }
-    void init() {
-        String welcomeMessage =
-                "=".repeat(30) +
-                        "\n Selamat datang di Binar Food \n" +
-                        "=".repeat(30);
-        System.out.println(welcomeMessage);
+        displayHeader("Selamat datang di Binar Food");
     }
 
     @Override
@@ -44,14 +37,8 @@ public class ConsoleOrderView implements OrderView {
 
     @Override
     public int displaySelectedMenuQty(String menuId, String menuName) {
-        StringBuilder askingForQtyMsg = new StringBuilder();
-        askingForQtyMsg.append("=".repeat(30))
-                .append("\n")
-                .append("Silahkan masukkan jumlah pesanan \n")
-                .append("=".repeat(30))
-                .append("\n")
-                .append("+ ")
-                .append(menuName);
+        displayHeader("Silahkan masukkan jumlah pesanan");
+        String askingForQtyMsg = "+ " + menuName;
         System.out.println(askingForQtyMsg);
         System.out.print("qty => ");
         int qty = 0;
@@ -71,9 +58,7 @@ public class ConsoleOrderView implements OrderView {
                     }
                 }
             } else {
-                System.out.println("=".repeat(30));
-                System.out.println("Mohon masukkan angka");
-                System.out.println("=".repeat(30));
+                displayHeader("Mohon masukkan jumlah pesanan");
                 System.out.print("qty => ");
                 inputMenu.nextLine();
             }
@@ -139,5 +124,11 @@ public class ConsoleOrderView implements OrderView {
         } else {
             return false;
         }
+    }
+
+    public void displayHeader(String msg) {
+        System.out.println("=".repeat(30));
+        System.out.println(msg);
+        System.out.println("=".repeat(30));
     }
 }
