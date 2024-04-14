@@ -1,7 +1,5 @@
 package org.example.entity;
 
-import java.util.Arrays;
-
 import static org.example.Const.menuPrice;
 
 public class Order implements OrderModel {

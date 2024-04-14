@@ -3,10 +3,6 @@ package org.example.helper;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class FileHelper {
     static String userHome = System.getProperty("user.home");
