@@ -15,6 +15,7 @@ class FileHelperTest {
     @BeforeEach
     void setup() {
         fileHelper = new FileHelper();
+        deleteFileIfExist();
     }
 
     @Test
@@ -39,6 +40,16 @@ class FileHelperTest {
             file.delete();
         } catch (Exception e) {
             Assertions.fail("Exception occured: " + e.getMessage());
+        }
+    }
+
+    private void deleteFileIfExist() {
+        String fileName = "invoice-00.txt";
+        String filePath = System.getProperty("user.home") + "/Documents/" + fileName;
+        File file = new File(filePath);
+
+        if (file.exists()) {
+            file.delete();
         }
     }
 }

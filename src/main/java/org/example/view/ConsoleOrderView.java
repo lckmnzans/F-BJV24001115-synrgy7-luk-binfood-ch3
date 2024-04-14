@@ -3,121 +3,53 @@ package org.example.view;
 import java.util.Objects;
 import java.util.Scanner;
 
-import static org.example.Const.*;
+import static org.example.Const.menuList;
+import static org.example.Const.menuPrice;
 
 public class ConsoleOrderView implements OrderView {
     private final Scanner inputMenu;
+    public final static int separatorLength = 36;
     public ConsoleOrderView() {
         this.inputMenu = new Scanner(System.in);
         displayHeader("Selamat datang di Binar Food");
     }
 
     @Override
-    public String displayMainMenu() {
-        System.out.println(menuMessage);
-        System.out.print("=> ");
-        String userInput = inputMenu.nextLine();
-        return userInput;
+    public void displayMainMenu() {
+        displayMenuItem(menuList, menuPrice);
+        String footerContent =
+                """
+                    00. Lihat pesanan dan bayar        \s
+                    01. Keluar dan batalkan            \s""";
+        displayFooter(footerContent, "=>");
     }
 
     @Override
-    public String displaySelectedMenu(String menu) {
-        return switch (menu) {
-            case "1" -> "Nasi Goreng";
-            case "2" -> "Mie Goreng";
-            case "3" -> "Ayam Bali";
-            case "4" -> "Telur Bali";
-            case "5" -> "Orak-arik Ayam";
-            case "6" -> "Orak-arik Telur";
-            case "7" -> "Es Teh";
-            case "8" -> "Es Jeruk";
-            default -> "0";
-        };
-    }
-
-    @Override
-    public int displaySelectedMenuQty(String menuId, String menuName) {
+    public void displaySelectedMenu(String menuId, String menuName) {
         displayHeader("Silahkan masukkan jumlah pesanan");
-        String askingForQtyMsg = "+ " + menuName;
-        System.out.println(askingForQtyMsg);
-        System.out.print("qty => ");
-        int qty = 0;
-        while (true) {
-            if (inputMenu.hasNextInt()) {
-                qty = inputMenu.nextInt();
-                inputMenu.nextLine();
-                if (qty == 0) {
-                    return 0;
-                } else {
-                    System.out.println("=".repeat(30));
-                    boolean confirmation = displayConfirmationContinue(qty, menuId, menuName);
-                    if (confirmation) {
-                        return qty;
-                    } else {
-                        return 0;
-                    }
-                }
-            } else {
-                displayHeader("Mohon masukkan jumlah pesanan");
-                System.out.print("qty => ");
-                inputMenu.nextLine();
-            }
-        }
+        displayBody("+ "+ menuName);
+        displayFooter("", "=>");
     }
 
     @Override
-    public String displayOrderedMenu(int[][] item) {
-        StringBuilder invoice = new StringBuilder();
-        int totalPrice = 0;
-        invoice.append("=".repeat(30))
-                .append("\n")
-                .append(" ".repeat(10))
-                .append("Binar Food")
-                .append(" ".repeat(10))
-                .append("\n")
-                .append("=".repeat(30))
-                .append("\n");
-        System.out.println("=".repeat(30));
-        for (int i=0;i<item[0].length;i++) {
-            if (item[0][i] != 0) {
-                String orderedMenu = item[0][i] + " " + menuList[i] + " | " + item[1][i];
-                invoice.append(orderedMenu).append("\n");
-                System.out.println(orderedMenu);
-                totalPrice += item[1][i];
-            }
-        }
-        System.out.println("-".repeat(30));
-        System.out.println("Total = " + totalPrice + "\n");
-        invoice.append("-".repeat(30))
-                .append("\n")
-                .append("Total = ")
-                .append(totalPrice)
-                .append("\n");
-        boolean confirmation = displayConfirmationOrder();
-        if (confirmation) {
-            return invoice.toString();
-        } else {
-            return null;
-        }
-    }
-
-    public boolean displayConfirmationOrder() {
-        System.out.println("00. Bayar pesanan");
-        System.out.println("01. Batalkan pesanan");
-        String userInput = inputMenu.nextLine();
-        if (Objects.equals(userInput, "00")) {
-            return true;
-        } else {
-            return false;
-        }
+    public void displayOrderedMenu(String content) {
+        System.out.println(content);
+        String footerContent =
+                """
+                    00. Bayar pesanan               \s
+                    01. Batalkan pesanan            \s""";
+        displayFooter(footerContent, "=>");
     }
 
     public boolean displayConfirmationContinue(int menuQty, String menuId, String menuName) {
-        System.out.println("Konfirmasi menu pesanan anda"+"\n"+"=".repeat(30));
-        System.out.println(menuQty + " " + menuName + " | " + menuPrice[Integer.parseInt(menuId) - 1] * menuQty);
-        System.out.println("-".repeat(30));
-        System.out.println("00. Konfirmasi pesanan");
-        System.out.println("01. Batalkan pesanan");
+        displayHeader("Konfirmasi menu pesanan anda");
+        String bodyContent = String.format("%-26s | %6d", menuQty+" "+menuName, menuPrice[Integer.parseInt(menuId) - 1] * menuQty);
+        displayBody(bodyContent);
+        String footerContent =
+                """
+                    00. Konfirmasi pesanan         \s
+                    01. Batalkan pesanan           \s""";
+        displayFooter(footerContent, "=>");
         String userInput = inputMenu.nextLine();
         if (Objects.equals(userInput, "00")) {
             return true;
@@ -126,9 +58,34 @@ public class ConsoleOrderView implements OrderView {
         }
     }
 
-    public void displayHeader(String msg) {
-        System.out.println("=".repeat(30));
-        System.out.println(msg);
-        System.out.println("=".repeat(30));
+    public void displayHeader(String content) {
+        int contentEndsAt = separatorLength - (separatorLength - content.length()) / 2;
+        System.out.println("=".repeat(separatorLength));
+        System.out.printf("%" + contentEndsAt + "s%n", content);
+        System.out.println("=".repeat(separatorLength));
+    }
+
+    public void displayBody(String content) {
+        System.out.println(content);
+    }
+
+    public void displayFooter(String content, String symbol, boolean newLine) {
+        System.out.println("-".repeat(separatorLength));
+        if (!content.isBlank()) {
+            System.out.println(content);
+        }
+        System.out.print(symbol + " ");
+        if (newLine) System.out.println();
+    }
+
+    public void displayFooter(String content, String symbol) {
+        displayFooter(content, symbol, false);
+    }
+
+    public void displayMenuItem(String[] menuName, int[] menuPrice) {
+        for (int i = 0; i < menuName.length; i++) {
+            String num = String.valueOf(1+i).concat(". ");
+            System.out.printf("%-26s | %6d\n", num+menuName[i], menuPrice[i]);
+        }
     }
 }
