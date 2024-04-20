@@ -1,13 +1,13 @@
 package org.example.controller;
 
-import org.example.entity.OrderModel;
+import org.example.service.OrdersService;
 import org.example.view.OrderView;
 
 abstract class OrderController {
-    protected OrderModel model;
+    protected OrdersService model;
     protected OrderView view;
 
-    public OrderController(OrderModel model, OrderView view) {
+    public OrderController(OrdersService model, OrderView view) {
         this.model = model;
         this.view = view;
     }

@@ -8,7 +8,7 @@ import static org.example.Const.menuPrice;
 
 public class ConsoleOrderView implements OrderView {
     private final Scanner inputMenu;
-    public final static int separatorLength = 36;
+    public static final int SEP_LENGTH = 36;
     public ConsoleOrderView() {
         this.inputMenu = new Scanner(System.in);
         displayHeader("Selamat datang di Binar Food");
@@ -59,10 +59,10 @@ public class ConsoleOrderView implements OrderView {
     }
 
     public void displayHeader(String content) {
-        int contentEndsAt = separatorLength - (separatorLength - content.length()) / 2;
-        System.out.println("=".repeat(separatorLength));
+        int contentEndsAt = SEP_LENGTH - (SEP_LENGTH - content.length()) / 2;
+        System.out.println("=".repeat(SEP_LENGTH));
         System.out.printf("%" + contentEndsAt + "s%n", content);
-        System.out.println("=".repeat(separatorLength));
+        System.out.println("=".repeat(SEP_LENGTH));
     }
 
     public void displayBody(String content) {
@@ -70,7 +70,7 @@ public class ConsoleOrderView implements OrderView {
     }
 
     public void displayFooter(String content, String symbol, boolean newLine) {
-        System.out.println("-".repeat(separatorLength));
+        System.out.println("-".repeat(SEP_LENGTH));
         if (!content.isBlank()) {
             System.out.println(content);
         }
@@ -85,7 +85,7 @@ public class ConsoleOrderView implements OrderView {
     public void displayMenuItem(String[] menuName, int[] menuPrice) {
         for (int i = 0; i < menuName.length; i++) {
             String num = String.valueOf(1+i).concat(". ");
-            System.out.printf("%-26s | %6d\n", num+menuName[i], menuPrice[i]);
+            System.out.printf("%-26s | %6d%n", num+menuName[i], menuPrice[i]);
         }
     }
 }
