@@ -1,28 +1,59 @@
 package org.example.entity;
 
-import static org.example.Const.menuPrice;
+import java.time.LocalTime;
 
-public class Order implements OrderModel {
-    private final int[][] orderedMenu = new int[2][8];
-
-    @Override
-    public boolean addOrders(String menu, int quantity) {
-        int menuId = Integer.parseInt(menu);
-        orderedMenu[0][menuId-1] = quantity;
-        orderedMenu[1][menuId-1] = menuPrice[menuId-1] * quantity;
-        return true;
+public class Order {
+    public Order(int id, LocalTime orderTime, String destinationAddress, int userId, boolean completed) {
+        this.id = id;
+        this.orderTime = orderTime;
+        this.destinationAddress = destinationAddress;
+        this.userId = userId;
+        this.completed = completed;
     }
 
-    @Override
-    public int[][] getOrders() {
-        return orderedMenu;
+    public int getId() {
+        return id;
     }
 
-    @Override
-    public void clearOrders() {
-        for (int i = 0; i < 8; i++) {
-            orderedMenu[0][i] = 0;
-            orderedMenu[1][i] = 0;
-        }
+    public void setId(int id) {
+        this.id = id;
     }
+
+    public LocalTime getOrderTime() {
+        return orderTime;
+    }
+
+    public void setOrderTime(LocalTime orderTime) {
+        this.orderTime = orderTime;
+    }
+
+    public String getDestinationAddress() {
+        return destinationAddress;
+    }
+
+    public void setDestinationAddress(String destinationAddress) {
+        this.destinationAddress = destinationAddress;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    private int id;
+    private LocalTime orderTime;
+    private String destinationAddress;
+    private int userId;
+    private boolean completed;
 }

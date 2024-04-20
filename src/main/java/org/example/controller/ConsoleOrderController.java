@@ -1,22 +1,25 @@
 package org.example.controller;
 
-import org.example.entity.OrderModel;
+import org.example.service.OrdersServiceImpl;
 import org.example.helper.FileHelper;
 import org.example.view.ConsoleOrderView;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Scanner;
 
 import static org.example.Const.*;
 
-public class ConsoleOrderController {
+public class ConsoleOrderController extends OrderController {
     private static final FileHelper fileHelper = new FileHelper();
     private final Scanner inputConsole;
-    private final OrderModel model;
-    private final ConsoleOrderView view;
+    private OrdersServiceImpl model;
+    private ConsoleOrderView view;
 
-    public ConsoleOrderController(OrderModel model, ConsoleOrderView view) {
+
+    public ConsoleOrderController(OrdersServiceImpl model, ConsoleOrderView view) {
+        super(model, view);
         this.model = model;
         this.view = view;
         this.inputConsole = new Scanner(System.in);
@@ -27,7 +30,7 @@ public class ConsoleOrderController {
         mainMenuProcess();
     }
 
-    private void mainMenuProcess() {
+    void mainMenuProcess() {
         view.displayMainMenu();
         String userInput = getUserInput();
 
@@ -43,7 +46,8 @@ public class ConsoleOrderController {
             });
             if (view.displayConfirmationContinue(menuQty, menuId, menuName)) {
                 if (menuQty != 0) {
-                    model.addOrders(userInput, menuQty);
+                    int[] menuQtyAndPrice = {menuQty, menuQty * menuPrice[Integer.parseInt(menuId) - 1]};
+                    model.setMapOrderedMenu(menuName, menuQtyAndPrice);
                     view.displayHeader("Menu berhasil ditambahkan ke daftar pesanan anda");
                     mainMenuProcess();
                 }
@@ -59,11 +63,10 @@ public class ConsoleOrderController {
         }
     }
 
-    private void subMenuProcess(String menu) {
+    void subMenuProcess(String menu) {
         if (Objects.equals(menu, "00")) {
-            boolean isOrderEmpty = isOrderEmpty();
-            if (!isOrderEmpty) {
-                int[][] item = model.getOrders();
+            if (!model.isOrderedMenuEmpty()) {
+                Map<String, int[]> item = model.getMapOrderedMenu();
                 String invoice = buildInvoiceFormat(item);
                 view.displayOrderedMenu(invoice);
                 boolean proceeded = getUserInputBool("00");
@@ -90,37 +93,23 @@ public class ConsoleOrderController {
         return menuList[menuId-1];
     }
 
-    private boolean isOrderEmpty() {
-        int[][] orderedMenu = model.getOrders();
-        int countOrderedItem = 0;
-        for (int i=0; i < orderedMenu[0].length; i++) {
-            if (orderedMenu[0][i] != 0) {
-                countOrderedItem++;
-            }
-        }
-        return countOrderedItem == 0;
-    }
-
-    private String buildInvoiceFormat(int[][] item) {
-        int totalPrice = 0;
-
+    private String buildInvoiceFormat(Map<String, int[]> item) {
         StringBuilder invoice = new StringBuilder()
-                .append("=".repeat(ConsoleOrderView.separatorLength))
+                .append("=".repeat(ConsoleOrderView.SEP_LENGTH))
                 .append("\n")
                 .append(String.format("%23s","Binar Food"))
                 .append("\n")
-                .append("=".repeat(ConsoleOrderView.separatorLength))
+                .append("=".repeat(ConsoleOrderView.SEP_LENGTH))
                 .append("\n");
 
-        for (int i=0;i<item[0].length;i++) {
-            if (item[0][i] != 0) {
-                String orderedMenu = String.format("%-26s | %6d", item[0][i] + " " + menuList[i], item[1][i]);
-                invoice.append(orderedMenu).append("\n");
-                totalPrice += item[1][i];
-            }
-        }
+        String orderedItem = buildOrderedMenu(item).orElse("Pesanan anda kosong");
+        invoice.append(orderedItem);
 
-        invoice.append("-".repeat(ConsoleOrderView.separatorLength))
+        int totalPrice = item.values().stream()
+                .mapToInt(menuItem -> menuItem[1])
+                .sum();
+
+        invoice.append("-".repeat(ConsoleOrderView.SEP_LENGTH))
                 .append("\n")
                 .append("Total = ")
                 .append(totalPrice)
@@ -157,5 +146,14 @@ public class ConsoleOrderController {
         } else {
             return false;
         }
+    }
+
+    private Optional<String> buildOrderedMenu(Map<String, int[]> item) {
+        StringBuilder orderedMenu = new StringBuilder();
+        item.forEach((menuName, menuQtyAndPrice) -> orderedMenu
+                .append(String.format("%-26s | %6d", menuQtyAndPrice[0] + " " + menuName, menuQtyAndPrice[1]))
+                .append("\n")
+        );
+        return Optional.of(orderedMenu.toString());
     }
 }
